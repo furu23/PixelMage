@@ -10,10 +10,13 @@ APPMObjectLever::APPMObjectLever()
 	PrimaryActorTick.bCanEverTick = false;
 
 	LeverAnimation = CreateDefaultSubobject<UPaperFlipbookComponent>("LeverAnimation");
+	LeverAnimation->SetLooping(false);
 }
 
 void APPMObjectLever::BeginPlay()
 {
+	Super::BeginPlay();
+
 	LeverAnimation->OnFinishedPlaying.AddUniqueDynamic(this, &APPMObjectLever::OnLeverAnimationFinished);
 }
 

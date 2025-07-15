@@ -13,9 +13,9 @@ APPMPlayer::APPMPlayer()
 	GridCameraComp->SetupAttachment(GridSpringArmComponent);
 
 	// Camera Height, Helper Function Will change this value
-	GridSpringArmComponent->TargetArmLength = 100.0f;
+	GridSpringArmComponent->TargetArmLength = 200.0f;
 	// Camera Rotation
-	GridSpringArmComponent->SetRelativeRotation(FRotator(-90.0f, 0, 0));
+	GridSpringArmComponent->SetRelativeRotation(FRotator(0, 10.0f, -90.0f));
 
 	// disable Character influence Camera
 	GridSpringArmComponent->bInheritPitch = false;
@@ -25,6 +25,8 @@ APPMPlayer::APPMPlayer()
 	// Make Interact Comp
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>("TriggerVolume");
 	TriggerVolume->SetupAttachment(RootComponent);
+	TriggerVolume->SetBoxExtent(FVector(GRID_TILE_SIZE / 2, GRID_TILE_SIZE / 2, GRID_TILE_SIZE / 2));
+	TriggerVolume->SetRelativeLocation(FVector(GRID_TILE_SIZE, 0, 0));
 
 	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &APPMPlayer::OnInteractOverlapBegin);
 
@@ -86,10 +88,10 @@ void APPMPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 
 	// Casting for UEnhancedInputComponent
 	UEnhancedInputComponent* GridEnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if (GridEnhancedInputComponent)
+	if (ensure(GridEnhancedInputComponent))
 	{
 		// Bind function for GridMove
-		GridEnhancedInputComponent->BindAction(GridIAMove, ETriggerEvent::Ongoing, this, &APPMPlayer::GridMove);
+		GridEnhancedInputComponent->BindAction(GridIAMove, ETriggerEvent::Triggered, this, &APPMPlayer::GridMove);
 		GridEnhancedInputComponent->BindAction(IAInteract, ETriggerEvent::Started, this, &APPMPlayer::InteractWithTarget);
 		// Another Actions are Here
 	}
@@ -107,18 +109,17 @@ void APPMPlayer::OnInteractOverlapBegin(class UPrimitiveComponent* OverlappedCom
 
 void APPMPlayer::OnInteractOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (Cast<IPPMInteractable>(OtherActor) == Interactable)
+	if (ensure(Cast<IPPMInteractable>(OtherActor) == Interactable))
 		Interactable = nullptr;
 }
 
 void APPMPlayer::InteractWithTarget()
 {
-	if (Interactable)
+	if (ensure(Interactable))
 		Interactable->Execute_OnInteract(this, Cast<AActor>(this), EPPMInteractType::Simple);
 	// Implementation Here
 }
 
-// use FORCEINLINE TRADEOFF?	
 void APPMPlayer::GridMove(const FInputActionValue& InputValue)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("1. GridMove Called!")); // <-- ¼öÁ¤
@@ -129,6 +130,11 @@ void APPMPlayer::GridMove(const FInputActionValue& InputValue)
 	// Delegate Broadcast Here
 
 	IPPMGridMovable::Execute_RequestMove(this, InputDirection);
+	const FVector2D NormalizedDirection = InputDirection.GetSafeNormal();
+
+	const FVector Direction3D = FVector(NormalizedDirection.X, NormalizedDirection.Y, 0.0f);
+	TriggerVolume->SetRelativeRotation(Direction3D.Rotation());
+
 }
 
 FORCEINLINE void APPMPlayer::SetCameraHeight(float CameraHeight)

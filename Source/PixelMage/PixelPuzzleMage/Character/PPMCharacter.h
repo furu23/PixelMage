@@ -40,9 +40,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid Character", meta = (AllowPrivateAccess = "true"))
 	FIntPoint TargetLocation;
 
-	// TileSize is Constance, UPROPERTY doesn't needed
-	const float GRID_TILE_SIZE = 16.0f;
-
 	// Movement Check Variable
 	bool bIsMoving = false;
 
@@ -68,4 +65,7 @@ public:
 
 	// RequestMove Helper Function
 	bool CanMoveTo(const FIntPoint& TargetPosition);
+
+	// TileSize is Constance, UPROPERTY doesn't needed
+	const float GRID_TILE_SIZE = 16.0f;
 };

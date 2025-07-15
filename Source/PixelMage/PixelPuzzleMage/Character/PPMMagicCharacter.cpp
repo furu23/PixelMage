@@ -8,7 +8,6 @@
 
 APPMMagicCharacter::APPMMagicCharacter()
 {
-
 }
 
 void APPMMagicCharacter::BeginPlay()

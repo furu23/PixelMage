@@ -38,7 +38,6 @@ void APPMCharacter::Tick(float DeltaTime)
 	// Refactoring here After
 	FVector TargetWorldLocation(TargetLocation.X * GRID_TILE_SIZE, TargetLocation.Y * GRID_TILE_SIZE, CurrentWorldLocation.Z);
 
-	// if (CurrentWorldLocation.Equals(TargetWorldLocation, 0.5)) What's better?
 	// if CurrentWorldLocation and TargetWorldLocation is enough to near, Set Axis to TargetWorldLoaction
 	if (FMath::Abs<double>(FVector::DistXY(CurrentWorldLocation, TargetWorldLocation)) <= 0.5)
 	{
@@ -69,7 +68,7 @@ void APPMCharacter::RequestMove_Implementation(const FVector2D& Direction)
 	GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::White, IsMovingStatus);
 	// --- 디버깅 코드 끝 ---
 
-	if (IsCurrentlyMove_Implementation())
+	if (ensure(IsCurrentlyMove_Implementation()))
 	{
 		return;
 	}
