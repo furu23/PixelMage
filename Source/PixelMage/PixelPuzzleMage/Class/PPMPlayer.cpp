@@ -114,7 +114,7 @@ void APPMPlayer::OnInteractOverlapEnd(class UPrimitiveComponent* OverlappedComp,
 void APPMPlayer::InteractWithTarget()
 {
 	if (Interactable)
-		Interactable->OnInteract();
+		Interactable->Execute_OnInteract(this, Cast<AActor>(this), EPPMInteractType::Simple);
 	// Implementation Here
 }
 

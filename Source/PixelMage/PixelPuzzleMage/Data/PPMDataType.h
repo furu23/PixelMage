@@ -43,3 +43,16 @@ enum class EPPMCharacterState : uint8
 	Attack,
 	Interact
 };
+
+// interact Enum here
+UENUM(BlueprintType, meta =(Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EPPMInteractType : uint8
+{
+	None = 0x0 UMETA(Hidden),
+	Simple = (1 << 0),
+	Lever = (1 << 1),
+	FireMagic = (1 << 2),
+	Attack = (1 << 3)
+};
+
+ENUM_CLASS_FLAGS(EPPMInteractType);

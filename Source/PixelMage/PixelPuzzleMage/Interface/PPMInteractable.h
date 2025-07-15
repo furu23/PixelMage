@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "../Data/PPMDataType.h"
+
 #include "UObject/Interface.h"
 #include "PPMInteractable.generated.h"
 
@@ -23,6 +26,6 @@ class PIXELMAGE_API IPPMInteractable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable", meta = (ToolTip = "상호작용 함수입니다."))
-	void OnInteract() const;
+	void OnInteract(AActor* Instigator, EPPMInteractType InteractType);
 
 };
