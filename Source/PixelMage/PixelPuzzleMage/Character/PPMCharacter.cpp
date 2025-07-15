@@ -15,14 +15,14 @@ void APPMCharacter::BeginPlay()
 
 	FVector CurrentWorldLocation = GetActorLocation();
 	CharacterStats.CharacterPosition.X = FMath::RoundToInt(CurrentWorldLocation.X / GRID_TILE_SIZE);
-	CharacterStats.CharacterPosition.Y = FMath::RoundToInt(CurrentWorldLocation.Y / GRID_TILE_SIZE);
+	CharacterStats.CharacterPosition.Y = FMath::RoundToInt(CurrentWorldLocation.Z / GRID_TILE_SIZE);
 
 	// Snap to Logical Location for Error caring (Grid Location)
 	FVector SnappedWorldLocation(
 		CharacterStats.CharacterPosition.X * GRID_TILE_SIZE,
-		CharacterStats.CharacterPosition.Y * GRID_TILE_SIZE,
-		CurrentWorldLocation.Z
-	);
+		CurrentWorldLocation.Y,
+		CharacterStats.CharacterPosition.Y * GRID_TILE_SIZE
+		);
 	SetActorLocation(SnappedWorldLocation);
 	TargetLocation = CharacterStats.CharacterPosition;
 }
@@ -36,10 +36,10 @@ void APPMCharacter::Tick(float DeltaTime)
 	// Decline Datas For VInterP
 	FVector CurrentWorldLocation = this->GetActorLocation();
 	// Refactoring here After
-	FVector TargetWorldLocation(TargetLocation.X * GRID_TILE_SIZE, TargetLocation.Y * GRID_TILE_SIZE, CurrentWorldLocation.Z);
+	FVector TargetWorldLocation(TargetLocation.X * GRID_TILE_SIZE, CurrentWorldLocation.Y, TargetLocation.Y * GRID_TILE_SIZE);
 
 	// if CurrentWorldLocation and TargetWorldLocation is enough to near, Set Axis to TargetWorldLoaction
-	if (FMath::Abs<double>(FVector::DistXY(CurrentWorldLocation, TargetWorldLocation)) <= 0.5)
+	if (FMath::Abs<double>(FVector::Dist(CurrentWorldLocation, TargetWorldLocation)) <= 0.5)
 	{
 		this->SetActorLocation(TargetWorldLocation);
 		CharacterStats.CharacterPosition = TargetLocation;
@@ -102,7 +102,7 @@ bool APPMCharacter::CanMoveTo(const FIntPoint& TargetPosition)
 	// (!!!) After Implementation Level, Scan to TargetPosition is in Valid axis
 	FVector Start = this->GetActorLocation();
 	// Target Position and  Convert it to World Location
-	FVector End(TargetPosition.X * GRID_TILE_SIZE, TargetPosition.Y * GRID_TILE_SIZE, Start.Z);
+	FVector End(TargetPosition.X * GRID_TILE_SIZE, Start.Y, TargetPosition.Y * GRID_TILE_SIZE);
 
 	// Collision Params, After Map Implementation Check Sprites here
 	FCollisionQueryParams GridParams;

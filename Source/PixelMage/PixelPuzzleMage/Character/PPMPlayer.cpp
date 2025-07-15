@@ -28,7 +28,6 @@ APPMPlayer::APPMPlayer()
 	TriggerVolume->SetBoxExtent(FVector(GRID_TILE_SIZE / 2, GRID_TILE_SIZE / 2, GRID_TILE_SIZE / 2));
 	TriggerVolume->SetRelativeLocation(FVector(GRID_TILE_SIZE, 0, 0));
 
-	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &APPMPlayer::OnInteractOverlapBegin);
 
 	// Interact Box Implementation Here
 }
@@ -37,6 +36,8 @@ void APPMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	APlayerController* GridPlayerController = Cast<APlayerController>(GetController());
+
+	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &APPMPlayer::OnInteractOverlapBegin);
 
 	if (ensure(GridPlayerController != nullptr))
 	{
@@ -105,12 +106,13 @@ void APPMPlayer::OnInteractOverlapBegin(class UPrimitiveComponent* OverlappedCom
 		// Component Box here
 		Interactable = Target;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("%s, %s, %s"), *OverlappedComp->GetFName().ToString(), *OtherActor->GetFName().ToString(), *OtherComp->GetFName().ToString());
 }
 
 void APPMPlayer::OnInteractOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (ensure(Cast<IPPMInteractable>(OtherActor) == Interactable))
-		Interactable = nullptr;
+		Interactable;
 }
 
 void APPMPlayer::InteractWithTarget()
@@ -125,15 +127,16 @@ void APPMPlayer::GridMove(const FInputActionValue& InputValue)
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("1. GridMove Called!")); // <-- ¼öÁ¤
 
 	// get Direction of Movement Input;
-	FVector2D InputDirection = InputValue.Get<FVector2D>();
+	FVector TempVector = InputValue.Get<FVector>();
+	FVector2D InputDirection(TempVector.X, TempVector.Z);
 
 	// Delegate Broadcast Here
 
 	IPPMGridMovable::Execute_RequestMove(this, InputDirection);
 	const FVector2D NormalizedDirection = InputDirection.GetSafeNormal();
-
-	const FVector Direction3D = FVector(NormalizedDirection.X, NormalizedDirection.Y, 0.0f);
-	TriggerVolume->SetRelativeRotation(Direction3D.Rotation());
+	const FVector Direction3D = FVector(NormalizedDirection.X, 0.0f, NormalizedDirection.Y);
+	TriggerVolume->SetRelativeRotation(TempVector.Rotation());
+	TriggerVolume->SetRelativeLocation(TempVector * 16);
 
 }
 
