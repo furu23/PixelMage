@@ -1,6 +1,7 @@
 #include "PPMPlayer.h"
 
 #include "Engine/Engine.h" // ¼öÁ¤
+#include "Engine/CollisionProfile.h"
 
 
 APPMPlayer::APPMPlayer()
@@ -27,6 +28,14 @@ APPMPlayer::APPMPlayer()
 	TriggerVolume->SetupAttachment(RootComponent);
 	TriggerVolume->SetBoxExtent(FVector(GRID_TILE_SIZE / 2, GRID_TILE_SIZE / 2, GRID_TILE_SIZE / 2));
 	TriggerVolume->SetRelativeLocation(FVector(GRID_TILE_SIZE, 0, 0));
+
+	// Confirmation of Debug
+	TriggerVolume->SetGenerateOverlapEvents(true);
+
+	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	TriggerVolume->SetCollisionObjectType(ECC_Pawn);
+	TriggerVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
+	TriggerVolume->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
 
 
 	// Interact Box Implementation Here
@@ -117,8 +126,10 @@ void APPMPlayer::OnInteractOverlapEnd(class UPrimitiveComponent* OverlappedComp,
 
 void APPMPlayer::InteractWithTarget()
 {
+	UE_LOG(LogTemp, Warning, TEXT("InteractWithTarget Called. Now Interactable : %p"), Interactable);
+
 	if (ensure(Interactable))
-		Interactable->Execute_OnInteract(this, Cast<AActor>(this), EPPMInteractType::Simple);
+		Interactable->Execute_OnInteract(Cast<UObject>(Interactable), Cast<AActor>(this), EPPMInteractType::Simple);
 	// Implementation Here
 }
 

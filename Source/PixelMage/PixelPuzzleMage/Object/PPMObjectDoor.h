@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 
 #include "../Data/PPMDataType.h"
-#include "../Interface/PPMInteractable.h"
+#include "PPMBaseInteracter.h"
 
 #include "GameFramework/Actor.h"
 #include "PaperFlipbookComponent.h"
 #include "PPMObjectDoor.generated.h"
 
 UCLASS()
-class PIXELMAGE_API APPMObjectDoor : public AActor, public IPPMInteractable
+class PIXELMAGE_API APPMObjectDoor : public APPMBaseInteracter
 {
 	GENERATED_BODY()
 	
@@ -25,27 +25,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "PPM Door", meta = (AllowPrivateAccess = "true"))
-	UPaperFlipbookComponent* DoorAnimation = nullptr;
-
-	// Accepting Type of Interact 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "PPM Door", meta = (AllowPrivateAccess = "true", Bitmask))
-	EPPMInteractType AcceptingInteract = EPPMInteractType::Lever;
-
-	FORCEINLINE bool bIsAnimationValid() const;
-
 	UFUNCTION()
 	// For Delegate Binding
 	void OnDoorAnimationFinished();
-
-	// Bool Variable for clarify
-	bool bIsEnable = false;
-
-protected:
-	// Interact Implementation, Compare InteractType and AccpetingInteract
-	virtual void OnInteract_Implementation(AActor* Interactor, EPPMInteractType InteractType) override;
-
-public:
-	// API for finding out enable
-	FORCEINLINE bool bIsEnabledNow() const;
 };
