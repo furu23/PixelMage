@@ -68,4 +68,5 @@ public:
 
 	// TileSize is Constance, UPROPERTY doesn't needed
 	const float GRID_TILE_SIZE = 16.0f;
+
 };

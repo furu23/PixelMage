@@ -47,8 +47,16 @@ public:
 	// Delegate
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterStateChanged, EPPMCharacterState, StateArgument);
 
+
+	
 	UPROPERTY(BlueprintAssignable)
 	FOnCharacterStateChanged OnChangeState;
+
+	void foo()
+	{
+
+	}
+
 
 	UFUNCTION(BlueprintCallable)
 	void SetState(EPPMCharacterState NewState);

@@ -47,6 +47,7 @@ void APPMPlayer::BeginPlay()
 	APlayerController* GridPlayerController = Cast<APlayerController>(GetController());
 
 	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &APPMPlayer::OnInteractOverlapBegin);
+	TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &APPMPlayer::OnInteractOverlapEnd);
 
 	if (ensure(GridPlayerController != nullptr))
 	{
@@ -115,13 +116,15 @@ void APPMPlayer::OnInteractOverlapBegin(class UPrimitiveComponent* OverlappedCom
 		// Component Box here
 		Interactable = Target;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s, %s, %s"), *OverlappedComp->GetFName().ToString(), *OtherActor->GetFName().ToString(), *OtherComp->GetFName().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("OverlapStart, %s, %s, %s"), *OverlappedComp->GetFName().ToString(), *OtherActor->GetFName().ToString(), *OtherComp->GetFName().ToString());
 }
 
 void APPMPlayer::OnInteractOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (ensure(Cast<IPPMInteractable>(OtherActor) == Interactable))
-		Interactable;
+		Interactable = nullptr;
+
+	UE_LOG(LogTemp, Warning, TEXT("OverlapEnd, %s, %s, %s"), *OverlappedComp->GetFName().ToString(), *OtherActor->GetFName().ToString(), *OtherComp->GetFName().ToString());
 }
 
 void APPMPlayer::InteractWithTarget()
@@ -147,8 +150,7 @@ void APPMPlayer::GridMove(const FInputActionValue& InputValue)
 	const FVector2D NormalizedDirection = InputDirection.GetSafeNormal();
 	const FVector Direction3D = FVector(NormalizedDirection.X, 0.0f, NormalizedDirection.Y);
 	TriggerVolume->SetRelativeRotation(TempVector.Rotation());
-	TriggerVolume->SetRelativeLocation(TempVector * 16);
-
+	TriggerVolume->SetRelativeLocation(TempVector * GRID_TILE_SIZE);
 }
 
 FORCEINLINE void APPMPlayer::SetCameraHeight(float CameraHeight)
